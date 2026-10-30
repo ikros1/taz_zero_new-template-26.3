@@ -38,3 +38,8 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# project-local toolchain and Gradle home (see README)
+
+/tools/
+/.gradle-user/

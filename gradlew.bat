@@ -62,6 +62,17 @@ set APP_HOME=%DIRNAME%
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
 
+@rem --- project-local toolchain ---------------------------------------------
+@rem Prefer the JDK and Gradle user home bundled with this project (tools/jdk,
+@rem .gradle-user) so builds work without a system JDK 25 and without write
+@rem access to %USERPROFILE%\.gradle. Both are optional and git-ignored.
+@rem The Gradle user home is passed as a system property because "endlocal"
+@rem below clears environment variables set inside this script's setlocal.
+if exist "%APP_HOME%\tools\jdk\bin\java.exe" set "JAVA_HOME=%APP_HOME%\tools\jdk"
+set "GRADLE_USER_HOME_OPT="
+if exist "%APP_HOME%\.gradle-user" set "GRADLE_USER_HOME_OPT="-Dgradle.user.home=%APP_HOME%\.gradle-user""
+@rem ------------------------------------------------------------------------
+
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
 
@@ -104,7 +115,7 @@ goto exitWithErrorLevel
 @rem Execute gradlew
 @rem endlocal doesn't take effect until after the line is parsed and variables are expanded
 @rem which allows us to clear the local environment before executing the java command
-endlocal & "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %* & call :exitWithErrorLevel & goto exitWithErrorLevel
+endlocal & "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %GRADLE_USER_HOME_OPT% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -jar "%APP_HOME%\gradle\wrapper\gradle-wrapper.jar" %* & call :exitWithErrorLevel & goto exitWithErrorLevel
 
 @rem This label must not be changed. We rely on old scripts being able to jump to this point.
 :exitWithErrorLevel
